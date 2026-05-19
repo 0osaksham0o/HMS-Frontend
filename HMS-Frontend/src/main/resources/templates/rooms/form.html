@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/><title>Room Form — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/rooms.css}"/>
+</head>
+<body>
+<div class="navbar">
+  <a class="navbar-logo" href="/">
+
+    <div class="logo-icon">✚</div>
+
+    <span>MediVeda</span>
+
+  </a>
+  <div class="breadcrumb">
+    <span class="bc-link"><a href="/rooms" style="color:#555;text-decoration:none;">Room</a></span>
+    <span class="bc-sep">›</span><span class="bc-cur" th:text="${isNew} ? 'New' : 'Edit'"></span>
+  </div>
+</div>
+<div class="page">
+  <a href="/rooms" class="back-btn">← Back to Room</a>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+  <div class="form-card">
+    <div class="form-title" th:text="${isNew} ? 'New Room' : 'Edit Room'"></div>
+    <form th:action="${isNew} ? '/rooms' : '/rooms/' + ${item['roomNumber']} + '/update'" method="post">
+      <div class="form-grid">
+        <div class="form-group"><label>Room Number</label>
+          <input type="number" name="roomNumber" th:value="${item['roomNumber']}" th:readonly="${!isNew}" required/>
+        </div>
+        <div class="form-group"><label>Room Type</label>
+          <select name="roomType">
+            <option value="Single"  th:selected="${item['roomType'] == 'Single'}">Single</option>
+            <option value="Double"  th:selected="${item['roomType'] == 'Double'}">Double</option>
+            <option value="ICU"     th:selected="${item['roomType'] == 'ICU'}">ICU</option>
+            <option value="Suite"   th:selected="${item['roomType'] == 'Suite'}">Suite</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Block Floor</label>
+          <input type="number" name="blockFloor" th:value="${item['blockFloor']}" required/>
+        </div>
+        <div class="form-group"><label>Block Code</label>
+          <input type="number" name="blockCode" th:value="${item['blockCode']}" required/>
+        </div>
+        <div class="form-group full"><label>Unavailable</label>
+          <select name="unavailable">
+            <option value="false" th:selected="${item['unavailable'] == false || item['unavailable'] == null}">No (Available)</option>
+            <option value="true"  th:selected="${item['unavailable'] == true}">Yes (Unavailable)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" th:text="${isNew} ? 'Create Room' : 'Update Room'"></button>
+        <a href="/rooms" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+</body></html>

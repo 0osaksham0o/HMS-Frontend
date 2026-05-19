@@ -70,7 +70,7 @@ public class PatientWebController {
             ra.addFlashAttribute("success", "Patient created successfully.");
             return "redirect:/patients";
         } catch (Exception e) {
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", p);
             m.addAttribute("isNew", true);
             m.addAttribute("physicians", api.getList("/api/physicians"));
@@ -103,7 +103,7 @@ public class PatientWebController {
         } catch (Exception e) {
             Map<String,Object> item = new HashMap<>(p);
             item.put("ssn", id);
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", item);
             m.addAttribute("isNew", false);
             m.addAttribute("physicians", api.getList("/api/physicians"));
@@ -114,7 +114,7 @@ public class PatientWebController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id, RedirectAttributes ra) {
         try { api.delete(API+"/"+id); ra.addFlashAttribute("success","Patient deleted."); }
-        catch(Exception e){ ra.addFlashAttribute("error","Cannot delete: "+e.getMessage()); }
+        catch(Exception e){ ra.addFlashAttribute("error", ErrorMessageHelper.friendly(e)); }
         return "redirect:/patients";
     }
 }
