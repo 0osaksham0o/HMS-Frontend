@@ -6,11 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller @RequestMapping("/nurses")
 public class NurseWebController {
@@ -35,7 +31,7 @@ public class NurseWebController {
 
         // ── On-Call Schedule (/api/oncalls → OnCallDTO flat format) ──────────
         List<Map<String, Object>> allOnCalls = api.getList("/api/oncalls");
-        List<Map<String, Object>> onCalls = new ArrayList<>();
+        List<Map<String, Object>> onCalls = new java.util.ArrayList<>();
         for (Map<String, Object> oc : allOnCalls) {
             Object nid = oc.get("nurseId");
             // Also handle HATEOAS nested id just in case
@@ -46,7 +42,7 @@ public class NurseWebController {
 
         // ── Prep Nurse Appointments (/api/appointments → Appointment entity) ──
         List<Map<String, Object>> allAppts = api.getList("/api/appointments");
-        List<Map<String, Object>> prepAppts = new ArrayList<>();
+        List<Map<String, Object>> prepAppts = new java.util.ArrayList<>();
         for (Map<String, Object> a : allAppts) {
             boolean matches = false;
             // Case 1: prepNurse is a nested Map with employeeId
@@ -66,7 +62,7 @@ public class NurseWebController {
 
         // ── Assisted Procedures (/api/undergoes → Undergoes entity) ──────────
         List<Map<String, Object>> allUndergoes = api.getList("/api/undergoes");
-        List<Map<String, Object>> assistedProcs = new ArrayList<>();
+        List<Map<String, Object>> assistedProcs = new java.util.ArrayList<>();
         for (Map<String, Object> u : allUndergoes) {
             Object an = u.get("assistingNurse");
             if (an instanceof Map) {
@@ -99,7 +95,7 @@ public class NurseWebController {
             ra.addFlashAttribute("success", "Nurse created successfully.");
             return "redirect:/nurses";
         } catch (Exception e) {
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", p);
             m.addAttribute("isNew", true);
             return "nurses/form";
@@ -126,7 +122,7 @@ public class NurseWebController {
         } catch (Exception e) {
             Map<String,Object> item = new HashMap<>(p);
             item.put("employeeId", id);
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", item);
             m.addAttribute("isNew", false);
             return "nurses/form";
@@ -136,7 +132,7 @@ public class NurseWebController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id, RedirectAttributes ra) {
         try { api.delete(API+"/"+id); ra.addFlashAttribute("success","Nurse deleted."); }
-        catch(Exception e){ ra.addFlashAttribute("error","Cannot delete: "+e.getMessage()); }
+        catch(Exception e){ ra.addFlashAttribute("error", ErrorMessageHelper.friendly(e)); }
         return "redirect:/nurses";
     }
 }
