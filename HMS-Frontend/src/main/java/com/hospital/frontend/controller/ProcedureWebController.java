@@ -78,7 +78,7 @@ public class ProcedureWebController {
             ra.addFlashAttribute("success", "Procedure created successfully.");
             return "redirect:/procedures";
         } catch (Exception e) {
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", p);
             m.addAttribute("isNew", true);
             return "procedures/form";
@@ -103,7 +103,7 @@ public class ProcedureWebController {
         } catch (Exception e) {
             Map<String,Object> item = new HashMap<>(p);
             item.put("code", id);
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", item);
             m.addAttribute("isNew", false);
             return "procedures/form";
@@ -113,7 +113,7 @@ public class ProcedureWebController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id, RedirectAttributes ra) {
         try { api.delete(API+"/"+id); ra.addFlashAttribute("success","Procedure deleted."); }
-        catch(Exception e){ ra.addFlashAttribute("error","Cannot delete: "+e.getMessage()); }
+        catch(Exception e){ ra.addFlashAttribute("error", ErrorMessageHelper.friendly(e)); }
         return "redirect:/procedures";
     }
 }
