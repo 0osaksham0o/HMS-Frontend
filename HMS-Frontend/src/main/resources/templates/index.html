@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>MediVeda HMS</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+
+  <style>
+
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+    }
+
+    :root{
+        --dark:#1F6F5F;
+        --primary:#2FA084;
+        --light-green:#6FCF97;
+        --bg:#EEEEEE;
+        --white:#ffffff;
+        --text:#1c1c1c;
+        --muted:#6b7280;
+
+        --shadow:
+            0 10px 30px rgba(0,0,0,0.06);
+
+        --card-shadow:
+            0 20px 45px rgba(31,111,95,0.08);
+    }
+
+    body{
+        font-family:'Inter',sans-serif;
+
+        background:
+            radial-gradient(circle at top left,
+            rgba(111,207,151,0.18),
+            transparent 25%),
+
+            radial-gradient(circle at bottom right,
+            rgba(47,160,132,0.10),
+            transparent 30%),
+
+            linear-gradient(135deg,#f8f8f8,#EEEEEE);
+
+        min-height:100vh;
+
+        color:var(--text);
+
+        overflow-x:hidden;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================= */
+
+    .navbar{
+        width:100%;
+        height:85px;
+
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+
+        padding:0 70px;
+
+        position:sticky;
+        top:0;
+        z-index:999;
+
+        backdrop-filter:blur(14px);
+
+        background:rgba(255,255,255,0.65);
+
+        border-bottom:1px solid rgba(255,255,255,0.25);
+    }
+
+    .navbar-logo{
+        text-decoration:none;
+
+        font-size:1.9rem;
+        font-weight:800;
+
+        color:var(--dark);
+
+        letter-spacing:-1px;
+
+        display:flex;
+        align-items:center;
+        gap:12px;
+
+        transition:0.3s ease;
+    }
+
+    .navbar-logo:hover{
+        color:var(--primary);
+        transform:translateY(-1px);
+    }
+
+    .logo-icon{
+        width:48px;
+        height:48px;
+
+        border-radius:16px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        background:linear-gradient(
+            135deg,
+            var(--primary),
+            var(--light-green)
+        );
+
+        color:white;
+
+        font-size:1.3rem;
+
+        box-shadow:
+            0 10px 25px rgba(47,160,132,0.25);
+    }
+
+    /* =========================
+       PAGE
+    ========================= */
+
+    .page{
+        max-width:1400px;
+        margin:auto;
+        padding:60px 45px;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero{
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+
+        gap:40px;
+
+        margin-bottom:70px;
+    }
+
+    .hero-left{
+        flex:1;
+    }
+
+    .hero-title{
+        font-size:4rem;
+        font-weight:800;
+
+        line-height:1.1;
+
+        color:var(--dark);
+
+        letter-spacing:-3px;
+
+        margin-bottom:22px;
+    }
+
+    .hero-title span{
+        background:linear-gradient(
+            135deg,
+            var(--primary),
+            var(--light-green)
+        );
+
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+    }
+
+    .hero-sub{
+        max-width:650px;
+
+        font-size:1.08rem;
+        line-height:1.8;
+
+        color:var(--muted);
+
+        margin-bottom:35px;
+    }
+
+    .hero-badges{
+        display:flex;
+        flex-wrap:wrap;
+        gap:15px;
+    }
+
+    .badge{
+        padding:12px 18px;
+
+        background:white;
+
+        border-radius:16px;
+
+        box-shadow:var(--shadow);
+
+        font-size:0.92rem;
+        font-weight:600;
+
+        color:var(--dark);
+
+        border:1px solid rgba(47,160,132,0.08);
+    }
+
+    /* =========================
+       NEW HERO CARD
+    ========================= */
+
+    .hero-info-card{
+
+        width:360px;
+
+        background:
+            rgba(255,255,255,0.75);
+
+        backdrop-filter:blur(16px);
+
+        border-radius:34px;
+
+        padding:38px 32px;
+
+        border:
+            1px solid rgba(255,255,255,0.35);
+
+        box-shadow:
+            var(--card-shadow);
+
+        position:relative;
+
+        overflow:hidden;
+    }
+
+    .hero-info-card::before{
+
+        content:"";
+
+        position:absolute;
+
+        top:-80px;
+        right:-80px;
+
+        width:180px;
+        height:180px;
+
+        border-radius:50%;
+
+        background:
+            rgba(111,207,151,0.12);
+    }
+
+    .info-icon{
+
+        width:72px;
+        height:72px;
+
+        border-radius:22px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--light-green)
+            );
+
+        color:white;
+
+        font-size:2rem;
+
+        margin-bottom:24px;
+
+        box-shadow:
+            0 12px 28px rgba(47,160,132,0.25);
+    }
+
+    .info-title{
+
+        font-size:1.6rem;
+
+        font-weight:800;
+
+        color:var(--dark);
+
+        margin-bottom:14px;
+    }
+
+    .info-text{
+
+        color:var(--muted);
+
+        line-height:1.8;
+
+        font-size:0.98rem;
+
+        margin-bottom:28px;
+    }
+
+    .info-stats{
+
+        display:flex;
+
+        gap:14px;
+
+        flex-wrap:wrap;
+    }
+
+    .mini-stat{
+
+        flex:1;
+
+        min-width:85px;
+
+        background:
+            rgba(47,160,132,0.08);
+
+        border-radius:18px;
+
+        padding:14px;
+
+        display:flex;
+        flex-direction:column;
+
+        align-items:center;
+        justify-content:center;
+    }
+
+    .mini-stat-number{
+
+        font-size:1.2rem;
+
+        font-weight:800;
+
+        color:var(--dark);
+
+        margin-bottom:4px;
+    }
+
+    .mini-stat-label{
+
+        font-size:0.82rem;
+
+        color:var(--muted);
+
+        font-weight:600;
+    }
+
+    /* =========================
+       GRID
+    ========================= */
+
+    .team-grid{
+        display:grid;
+
+        grid-template-columns:
+            repeat(auto-fit,minmax(270px,1fr));
+
+        gap:30px;
+    }
+
+    .entity-card{
+        position:relative;
+
+        text-decoration:none;
+
+        background:
+            rgba(255,255,255,0.75);
+
+        backdrop-filter:blur(14px);
+
+        border-radius:30px;
+
+        padding:35px 30px;
+
+        overflow:hidden;
+
+        transition:0.45s ease;
+
+        box-shadow:var(--card-shadow);
+
+        border:1px solid rgba(255,255,255,0.4);
+    }
+
+    .entity-card:hover{
+        transform:translateY(-10px);
+
+        box-shadow:
+            0 25px 50px rgba(31,111,95,0.15);
+    }
+
+    .avatar-circle{
+        width:80px;
+        height:80px;
+
+        border-radius:24px;
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        background:
+            linear-gradient(
+                135deg,
+                var(--primary),
+                var(--light-green)
+            );
+
+        color:white;
+
+        font-size:2rem;
+
+        margin-bottom:28px;
+
+        box-shadow:
+            0 12px 28px rgba(47,160,132,0.25);
+
+        transition:0.4s ease;
+    }
+
+    .entity-card:hover .avatar-circle{
+        transform:
+            scale(1.08)
+            rotate(-4deg);
+    }
+
+    .entity-name{
+        font-size:1.45rem;
+        font-weight:700;
+
+        color:var(--dark);
+
+        margin-bottom:12px;
+    }
+
+    .entity-count{
+        font-size:0.97rem;
+
+        color:var(--muted);
+
+        font-weight:500;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .footer{
+        margin-top:80px;
+
+        text-align:center;
+
+        color:var(--muted);
+
+        font-size:0.95rem;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media(max-width:950px){
+
+        .hero{
+            flex-direction:column;
+            align-items:flex-start;
+        }
+
+        .hero-info-card{
+            width:100%;
+        }
+    }
+
+    @media(max-width:768px){
+
+        .navbar{
+            padding:0 22px;
+            height:75px;
+        }
+
+        .page{
+            padding:40px 20px;
+        }
+
+        .hero-title{
+            font-size:2.7rem;
+        }
+
+        .hero-sub{
+            font-size:0.98rem;
+        }
+
+        .entity-card{
+            padding:30px 24px;
+        }
+
+        .avatar-circle{
+            width:72px;
+            height:72px;
+            font-size:1.7rem;
+        }
+
+        .navbar-logo{
+            font-size:1.45rem;
+        }
+
+        .logo-icon{
+            width:42px;
+            height:42px;
+        }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+  <a class="navbar-logo" href="/">
+
+    <div class="logo-icon">✚</div>
+
+    MediVeda
+
+  </a>
+
+</div>
+
+<!-- PAGE -->
+
+<div class="page">
+
+  <!-- HERO -->
+
+  <div class="hero">
+
+    <div class="hero-left">
+
+      <div class="hero-title">
+        Intelligent <span>Hospital</span><br/>
+        Management System
+      </div>
+
+      <div class="hero-sub">
+        Manage hospital operations seamlessly with a modern healthcare dashboard designed for physicians, nurses, appointments, departments, and patient records.
+      </div>
+
+      <div class="hero-badges">
+
+        <div class="badge">Secure Records</div>
+
+        <div class="badge">Smart Scheduling</div>
+
+        <div class="badge">Realtime Management</div>
+
+        <div class="badge">Modern UI</div>
+
+      </div>
+
+    </div>
+
+    <!-- HERO CARD -->
+
+    <div class="hero-info-card">
+
+      <div class="info-icon">✚</div>
+
+      <div class="info-title">
+        Smart Healthcare Ecosystem
+      </div>
+
+      <div class="info-text">
+        Streamline hospital workflows with centralized management for departments, appointments, procedures, rooms, nurses, physicians, and patients.
+      </div>
+
+      <div class="info-stats">
+
+        <div class="mini-stat">
+          <span class="mini-stat-number">7+</span>
+          <span class="mini-stat-label">Modules</span>
+        </div>
+
+        <div class="mini-stat">
+          <span class="mini-stat-number">Easy</span>
+          <span class="mini-stat-label">Management</span>
+        </div>
+
+        <div class="mini-stat">
+          <span class="mini-stat-number">Fast</span>
+          <span class="mini-stat-label">Access</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- GRID -->
+
+  <div class="team-grid">
+
+    <a href="/physicians" class="entity-card">
+      <div class="avatar-circle">🩺</div>
+      <div class="entity-name">Physician</div>
+      <div class="entity-count">Manage physician records</div>
+    </a>
+
+    <a href="/patients" class="entity-card">
+      <div class="avatar-circle">🧑‍🤝‍🧑</div>
+      <div class="entity-name">Patients</div>
+      <div class="entity-count">Patient management system</div>
+    </a>
+
+    <a href="/nurses" class="entity-card">
+      <div class="avatar-circle">👩‍⚕️</div>
+      <div class="entity-name">Nurses</div>
+      <div class="entity-count">Nursing department records</div>
+    </a>
+
+    <a href="/departments" class="entity-card">
+      <div class="avatar-circle">🏢</div>
+      <div class="entity-name">Departments</div>
+      <div class="entity-count">Hospital department overview</div>
+    </a>
+
+    <a href="/appointments" class="entity-card">
+      <div class="avatar-circle">📅</div>
+      <div class="entity-name">Appointments</div>
+      <div class="entity-count">Smart appointment scheduling</div>
+    </a>
+
+    <a href="/procedures" class="entity-card">
+      <div class="avatar-circle">🔬</div>
+      <div class="entity-name">Procedures</div>
+      <div class="entity-count">Procedure management system</div>
+    </a>
+
+    <a href="/rooms" class="entity-card">
+      <div class="avatar-circle">🛏️</div>
+      <div class="entity-name">Rooms</div>
+      <div class="entity-count">Room allocation & tracking</div>
+    </a>
+
+  </div>
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+    MediVeda HMS • Smart Healthcare Management Platform
+  </div>
+
+</div>
+
+</body>
+</html>
