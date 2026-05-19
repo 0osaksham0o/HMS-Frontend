@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/><title>Room — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/rooms.css}"/>
+</head>
+<body>
+<div class="navbar">
+  <a class="navbar-logo" href="/">
+
+    <div class="logo-icon">✚</div>
+
+    <span>MediVeda</span>
+
+  </a>
+  <div class="breadcrumb">
+    <span class="bc-link"><a href="/" style="color:#555;text-decoration:none;">Home</a></span>
+    <span class="bc-sep">›</span><span class="bc-cur">Room</span>
+  </div>
+</div>
+<div class="page">
+  <a href="/" class="back-btn">← Back to Home</a>
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}"   class="alert alert-error"   th:text="${error}"></div>
+  <div class="tbl-header">
+    <div><div class="tbl-title">Room</div><div class="tbl-sub">Manage and review hospital room records.</div></div>
+  </div>
+  <div class="data-wrap">
+    <table>
+      <thead><tr><th>Room No.</th><th>Type</th><th>Block Floor</th><th>Block Code</th><th>Unavailable</th><th class="right">Actions</th></tr></thead>
+      <tbody>
+        <tr th:each="item : ${page.items}">
+          <td th:text="${item['roomNumber']}"></td>
+          <td th:text="${item['roomType']}"></td>
+          <td th:text="${item['blockFloor']}"></td>
+          <td th:text="${item['blockCode']}"></td>
+          <td>
+            <span th:if="${item['unavailable']}"  class="badge badge-no">Yes</span>
+            <span th:unless="${item['unavailable']}" class="badge badge-yes">No</span>
+          </td>
+          <td class="action-cell"><div>
+            <a class="btn-sm" th:href="@{'/rooms/' + ${item['roomNumber']}}">View</a>
+            <a class="btn-sm" th:href="@{'/rooms/' + ${item['roomNumber']} + '/edit'}">Update</a>
+            <form th:action="@{'/rooms/' + ${item['roomNumber']} + '/delete'}" method="post" style="display:inline">
+              <button class="btn-sm danger" onclick="return confirm('Delete?')">Delete</button>
+            </form>
+          </div></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(page.items)}" class="empty-row"><td colspan="6">No records found.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    <a th:if="${!page.first}" class="btn-page" th:href="@{/rooms(page=${page.prevPage})}">Previous</a>
+    <span th:if="${page.first}" class="btn-page disabled">Previous</span>
+    <a th:if="${!page.last}"  class="btn-page" th:href="@{/rooms(page=${page.nextPage})}">Next</a>
+    <span th:if="${page.last}"  class="btn-page disabled">Next</span>
+  </div>
+</div>
+</body></html>
