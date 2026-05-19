@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/><title>Appointment Form — HospitalDB</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/appointments.css}"/>
+    <style>
+        .datetime-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .datetime-row .form-group { margin: 0; }
+        .section-label {
+          font-size: 11px; font-weight: 600; color: #444;
+          text-transform: uppercase; letter-spacing: .4px;
+          margin-bottom: 6px;
+        }
+        .datetime-wrap { grid-column: 1 / -1; }
+        .navbar-logo{
+              text-decoration:none;
+
+              font-size:1.9rem;
+              font-weight:800;
+
+              color:var(--dark);
+
+              letter-spacing:-1px;
+
+              display:flex;
+              align-items:center;
+              gap:12px;
+
+              transition:0.3s ease;
+          }
+
+          .navbar-logo:hover{
+              color:var(--primary);
+              transform:translateY(-1px);
+          }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <a class="navbar-logo" href="/">
+
+        <div class="logo-icon">✚</div>
+
+        <span>MediVeda</span>
+
+    </a>
+    <div class="breadcrumb">
+        <span class="bc-link"><a href="/appointments" style="color:#555;text-decoration:none;">Appointment</a></span>
+        <span class="bc-sep">›</span><span class="bc-cur" th:text="${isNew} ? 'New' : 'Edit'"></span>
+    </div>
+</div>
+<div class="page">
+    <a href="/appointments" class="back-btn">← Back to Appointment</a>
+    <div class="form-card">
+        <div class="form-title" th:text="${isNew} ? 'New Appointment' : 'Edit Appointment'"></div>
+
+        <!-- Error alert inside card -->
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <form th:action="${isNew} ? '/appointments' : '/appointments/' + ${item['appointmentId']} + '/update'"
+              method="post">
+            <div class="form-grid">
+
+                <!-- Appointment ID -->
+                <div class="form-group">
+                    <label>Appointment ID</label>
+                    <input type="number" name="appointmentId"
+                           th:value="${item['appointmentId']}"
+                           th:readonly="${!isNew}" required/>
+                </div>
+
+                <!-- Examination Room dropdown -->
+                <div class="form-group">
+                    <label>Examination Room</label>
+                    <select name="examinationRoom" required>
+                        <option value="">— Select Room —</option>
+                        <option th:each="r : ${rooms}"
+                                th:value="${r['roomNumber']}"
+                                th:text="'Room ' + ${r['roomNumber']} + ' — ' + ${r['roomType']}"
+                                th:selected="${item['examinationRoom'] != null and item['examinationRoom'].toString() == r['roomNumber'].toString()}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Start Date + Time -->
+                <div class="form-group datetime-wrap">
+                    <div class="section-label">Start Date &amp; Time</div>
+                    <div class="datetime-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="startDate" required
+                                   th:value="${item['startDate'] != null ? item['startDate'] :
+                                (item['start'] != null ?
+                                  #strings.substring(item['start'].toString(), 0, 10) : '')}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" name="startTime" required
+                                   th:value="${item['startTime'] != null ? item['startTime'] :
+                                (item['start'] != null and #strings.length(item['start'].toString()) >= 16 ?
+                                  #strings.substring(item['start'].toString(), 11, 16) : '')}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Date + Time -->
+                <div class="form-group datetime-wrap">
+                    <div class="section-label">End Date &amp; Time</div>
+                    <div class="datetime-row">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" name="endDate" required
+                                   th:value="${item['endDate'] != null ? item['endDate'] :
+                                (item['end'] != null ?
+                                  #strings.substring(item['end'].toString(), 0, 10) : '')}"/>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" name="endTime" required
+                                   th:value="${item['endTime'] != null ? item['endTime'] :
+                                (item['end'] != null and #strings.length(item['end'].toString()) >= 16 ?
+                                  #strings.substring(item['end'].toString(), 11, 16) : '')}"/>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient dropdown -->
+                <div class="form-group full">
+                    <label>Patient</label>
+                    <select name="patientSsn" required>
+                        <option value="">— Select Patient —</option>
+                        <option th:each="pt : ${patients}"
+                                th:value="${pt['ssn']}"
+                                th:text="${pt['name']} + ' (SSN: ' + ${pt['ssn']} + ')'"
+                                th:selected="${item['patientSsn'] != null and item['patientSsn'].toString() == pt['ssn'].toString()}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Physician dropdown -->
+                <div class="form-group full">
+                    <label>Physician</label>
+                    <select name="physicianId" required>
+                        <option value="">— Select Physician —</option>
+                        <option th:each="ph : ${physicians}"
+                                th:value="${ph['employeeId']}"
+                                th:text="${ph['name']} + ' (ID: ' + ${ph['employeeId']} + ')'"
+                                th:selected="${item['physicianId'] != null and item['physicianId'].toString() == ph['employeeId'].toString()}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Prep Nurse dropdown (optional) -->
+                <div class="form-group full">
+                    <label>Prep Nurse <span style="color:#999;font-weight:400;">(optional)</span></label>
+                    <select name="prepNurseId">
+                        <option value="">— None —</option>
+                        <option th:each="nu : ${nurses}"
+                                th:value="${nu['employeeId']}"
+                                th:text="${nu['name']} + ' (ID: ' + ${nu['employeeId']} + ')'"
+                                th:selected="${item['prepNurseId'] != null and item['prepNurseId'].toString() == nu['employeeId'].toString()}">
+                        </option>
+                    </select>
+                </div>
+
+            </div><!-- /form-grid -->
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary"
+                        th:text="${isNew} ? 'Create Appointment' : 'Update Appointment'"></button>
+                <a href="/appointments" class="btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body></html>
