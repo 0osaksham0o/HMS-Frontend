@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/><title>Medication Detail — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+<div class="navbar">
+  <a class="navbar-logo" href="/">
+
+    <div class="logo-icon">✚</div>
+
+    <span>MediVeda</span>
+
+  </a>
+  <div class="breadcrumb">
+    <span class="bc-link"><a href="/medications" style="color:#555;text-decoration:none;">Medication</a></span>
+    <span class="bc-sep">›</span><span class="bc-cur" th:text="${item['name']}"></span>
+  </div>
+</div>
+<div class="page">
+  <a href="/medications" class="back-btn">← Back to Medication</a>
+  <div class="detail-top">
+    <div><div class="detail-title" th:text="${item['name']}"></div><div class="detail-sub">Medication</div></div>
+    <div class="detail-actions">
+      <a class="btn-edit" th:href="@{'/medications/' + ${item['code']} + '/edit'}">✏ EDIT</a>
+      <form th:action="@{'/medications/' + ${item['code']} + '/delete'}" method="post" style="display:inline">
+        <button class="btn-del" onclick="return confirm('Delete?')">🗑 DELETE</button>
+      </form>
+    </div>
+  </div>
+  <hr class="detail-divider"/>
+  <div class="detail-section-title">📋 Medication Details</div>
+  <table class="detail-table">
+    <tr><td class="key-cell">CODE</td><td class="val-cell" th:text="${item['code']}"></td></tr>
+    <tr><td class="key-cell">NAME</td><td class="val-cell" th:text="${item['name']}"></td></tr>
+    <tr><td class="key-cell">BRAND</td><td class="val-cell" th:text="${item['brand']}"></td></tr>
+    <tr><td class="key-cell">DESCRIPTION</td><td class="val-cell" th:text="${item['description']}"></td></tr>
+  </table>
+</div>
+</body></html>

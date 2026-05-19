@@ -43,9 +43,7 @@
           <td class="action-cell"><div>
             <a class="btn-sm" th:href="@{'/rooms/' + ${item['roomNumber']}}">View</a>
             <a class="btn-sm" th:href="@{'/rooms/' + ${item['roomNumber']} + '/edit'}">Update</a>
-            <form th:action="@{'/rooms/' + ${item['roomNumber']} + '/delete'}" method="post" style="display:inline">
-              <button class="btn-sm danger" onclick="return confirm('Delete?')">Delete</button>
-            </form>
+
           </div></td>
         </tr>
         <tr th:if="${#lists.isEmpty(page.items)}" class="empty-row"><td colspan="6">No records found.</td></tr>

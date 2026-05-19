@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title th:text="'Procedure — ' + ${item['name']} + ' — HospitalDB'">Procedure Detail — HospitalDB</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" th:href="@{/css/procedures.css}"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title th:text="'Procedure — ' + ${item['name']} + ' — HospitalDB'">Procedure Detail — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/procedures.css}"/>
 </head>
 <body>
 
@@ -28,7 +28,7 @@
   <!-- Back button -->
   <a href="/procedures" class="back-btn">← Back to Procedure</a>
 
-  <!-- Header: name + EDIT / DELETE -->
+  <!-- Header: name + EDIT -->
   <div class="detail-top">
     <div>
       <div class="detail-title" th:text="${item['name']}"></div>
@@ -36,9 +36,6 @@
     </div>
     <div class="detail-actions">
       <a class="btn-edit" th:href="@{'/procedures/' + ${item['code']} + '/edit'}">✎ EDIT</a>
-      <form th:action="@{'/procedures/' + ${item['code']} + '/delete'}" method="post" style="display:inline">
-        <button class="btn-del" onclick="return confirm('Delete this procedure?')">🗑 DELETE</button>
-      </form>
     </div>
   </div>
 
@@ -48,18 +45,18 @@
   <div class="detail-section-title"><span>📋</span> Procedure Details</div>
   <table class="detail-table">
     <tbody>
-    <tr>
-      <td class="key-cell">CODE</td>
-      <td class="val-cell" th:text="${item['code']}"></td>
-    </tr>
-    <tr>
-      <td class="key-cell">NAME</td>
-      <td class="val-cell" th:text="${item['name']}"></td>
-    </tr>
-    <tr>
-      <td class="key-cell">COST</td>
-      <td class="val-cell" th:text="'$' + ${item['cost']}"></td>
-    </tr>
+      <tr>
+        <td class="key-cell">CODE</td>
+        <td class="val-cell" th:text="${item['code']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">NAME</td>
+        <td class="val-cell" th:text="${item['name']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">COST</td>
+        <td class="val-cell" th:text="'$' + ${item['cost']}"></td>
+      </tr>
     </tbody>
   </table>
 
@@ -74,48 +71,48 @@
     <div class="data-wrap">
       <table>
         <thead>
-        <tr>
-          <th>EmployeeID</th>
-          <th>PhysicianName</th>
-          <th>Position</th>
-          <th>CertificationDate</th>
-          <th>CertificationExpires</th>
-        </tr>
+          <tr>
+            <th>EmployeeID</th>
+            <th>PhysicianName</th>
+            <th>Position</th>
+            <th>CertificationDate</th>
+            <th>CertificationExpires</th>
+          </tr>
         </thead>
         <tbody>
-        <tr th:if="${#lists.isEmpty(certifiedPhysicians)}" class="empty-row">
-          <td colspan="5">No physicians certified for this procedure.</td>
-        </tr>
-        <tr th:each="cp : ${certifiedPhysicians}"
-            class="clickable-row"
-            th:onclick="|window.location='/physicians/' + ${cp['physicianEmployeeId']}|"
-            title="Open Physician">
+          <tr th:if="${#lists.isEmpty(certifiedPhysicians)}" class="empty-row">
+            <td colspan="5">No physicians certified for this procedure.</td>
+          </tr>
+          <tr th:each="cp : ${certifiedPhysicians}"
+              class="clickable-row"
+              th:onclick="|window.location='/physicians/' + ${cp['physicianEmployeeId']}|"
+              title="Open Physician">
 
-          <!-- EmployeeID -->
-          <td>
-            <a class="row-link"
-               th:href="@{'/physicians/' + ${cp['physicianEmployeeId']}}"
-               th:text="${cp['physicianEmployeeId']}"
-               onclick="event.stopPropagation()"></a>
-          </td>
+            <!-- EmployeeID -->
+            <td>
+              <a class="row-link"
+                 th:href="@{'/physicians/' + ${cp['physicianEmployeeId']}}"
+                 th:text="${cp['physicianEmployeeId']}"
+                 onclick="event.stopPropagation()"></a>
+            </td>
 
-          <!-- PhysicianName -->
-          <td th:text="${cp['physicianName']}"></td>
+            <!-- PhysicianName -->
+            <td th:text="${cp['physicianName']}"></td>
 
-          <!-- Position -->
-          <td th:text="${cp['physicianPosition']}"></td>
+            <!-- Position -->
+            <td th:text="${cp['physicianPosition']}"></td>
 
-          <!-- CertificationDate — strip time part -->
-          <td th:text="${cp['certificationDate'] != null
+            <!-- CertificationDate — strip time part -->
+            <td th:text="${cp['certificationDate'] != null
                           ? #strings.substring(cp['certificationDate'].toString(), 0, 10)
                           : '—'}"></td>
 
-          <!-- CertificationExpires — strip time part -->
-          <td th:text="${cp['certificationExpires'] != null
+            <!-- CertificationExpires — strip time part -->
+            <td th:text="${cp['certificationExpires'] != null
                           ? #strings.substring(cp['certificationExpires'].toString(), 0, 10)
                           : '—'}"></td>
 
-        </tr>
+          </tr>
         </tbody>
       </table>
     </div>

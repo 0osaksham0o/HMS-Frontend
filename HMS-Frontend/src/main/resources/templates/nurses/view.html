@@ -38,9 +38,6 @@
     </div>
     <div class="detail-actions">
       <a class="btn-edit" th:href="@{'/nurses/' + ${item['employeeId']} + '/edit'}">✎ EDIT</a>
-      <form th:action="@{'/nurses/' + ${item['employeeId']} + '/delete'}" method="post" style="display:inline">
-        <button class="btn-del" onclick="return confirm('Delete this nurse?')">🗑 DELETE</button>
-      </form>
     </div>
   </div>
   <hr class="detail-divider"/>

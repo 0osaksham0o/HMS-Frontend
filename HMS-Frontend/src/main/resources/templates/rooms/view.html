@@ -38,9 +38,7 @@
     </div>
     <div class="detail-actions">
       <a class="btn-edit" th:href="@{'/rooms/' + ${item['roomNumber']} + '/edit'}">✎ EDIT</a>
-      <form th:action="@{'/rooms/' + ${item['roomNumber']} + '/delete'}" method="post" style="display:inline">
-        <button class="btn-del" onclick="return confirm('Delete this room?')">🗑 DELETE</button>
-      </form>
+
     </div>
   </div>
   <hr class="detail-divider"/>
