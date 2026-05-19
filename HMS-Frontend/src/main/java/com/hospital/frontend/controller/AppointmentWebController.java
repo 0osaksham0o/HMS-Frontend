@@ -15,6 +15,7 @@ public class AppointmentWebController {
     private static final String PATIENT_API = "/api/patients";
     private static final String PHY_API     = "/api/physicians";
     private static final String NURSE_API   = "/api/nurses";
+    private static final String ROOM_API    = "/api/rooms";
 
     @GetMapping
     public String list(@RequestParam(defaultValue="0") int page, Model m) {
@@ -37,12 +38,13 @@ public class AppointmentWebController {
     @PostMapping
     public String create(@RequestParam Map<String,String> p, Model m, RedirectAttributes ra) {
         try {
+            validateRoomAvailable(p.get("examinationRoom"));
             Map<String,Object> d = buildPayload(null, p);
             api.post(API, d);
             ra.addFlashAttribute("success", "Appointment created successfully.");
             return "redirect:/appointments";
         } catch (Exception e) {
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", p);
             m.addAttribute("isNew", true);
             loadDropdowns(m);
@@ -62,6 +64,7 @@ public class AppointmentWebController {
     public String update(@PathVariable int id, @RequestParam Map<String,String> p,
                          Model m, RedirectAttributes ra) {
         try {
+            validateRoomAvailable(p.get("examinationRoom"));
             Map<String,Object> d = buildPayload(id, p);
             api.put(API+"/"+id, d);
             ra.addFlashAttribute("success", "Appointment updated successfully.");
@@ -69,7 +72,7 @@ public class AppointmentWebController {
         } catch (Exception e) {
             Map<String,Object> item = new HashMap<>(p);
             item.put("appointmentId", id);
-            m.addAttribute("error", e.getMessage());
+            m.addAttribute("error", ErrorMessageHelper.friendly(e));
             m.addAttribute("item", item);
             m.addAttribute("isNew", false);
             loadDropdowns(m);
@@ -80,7 +83,7 @@ public class AppointmentWebController {
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable int id, RedirectAttributes ra) {
         try { api.delete(API+"/"+id); ra.addFlashAttribute("success","Appointment deleted."); }
-        catch(Exception e){ ra.addFlashAttribute("error","Cannot delete: "+e.getMessage()); }
+        catch(Exception e){ ra.addFlashAttribute("error", ErrorMessageHelper.friendly(e)); }
         return "redirect:/appointments";
     }
 
@@ -88,11 +91,54 @@ public class AppointmentWebController {
     //  Helpers
     // -----------------------------------------------------------------------
 
-    /** Loads patients, physicians, and nurses lists into model for dropdowns. */
+    /** Loads patients, physicians, nurses (registered only), and rooms lists into model for dropdowns. */
     private void loadDropdowns(Model m) {
         m.addAttribute("patients",   api.getList(PATIENT_API));
         m.addAttribute("physicians", api.getList(PHY_API));
-        m.addAttribute("nurses",     api.getList(NURSE_API));
+
+        // Only show registered nurses in the Prep Nurse dropdown
+        List<Map<String,Object>> allNurses = api.getList(NURSE_API);
+        List<Map<String,Object>> registeredNurses = new ArrayList<>();
+        for (Map<String,Object> nurse : allNurses) {
+            Object reg = nurse.get("registered");
+            if (Boolean.TRUE.equals(reg) || "true".equalsIgnoreCase(String.valueOf(reg))) {
+                registeredNurses.add(nurse);
+            }
+        }
+        m.addAttribute("nurses", registeredNurses);
+
+        // Only show available rooms in the Examination Room dropdown
+        List<Map<String,Object>> allRooms = api.getList(ROOM_API);
+        List<Map<String,Object>> availableRooms = new ArrayList<>();
+        for (Map<String,Object> room : allRooms) {
+            Object unavailable = room.get("unavailable");
+            if (!Boolean.TRUE.equals(unavailable) && !"true".equalsIgnoreCase(String.valueOf(unavailable))) {
+                availableRooms.add(room);
+            }
+        }
+        m.addAttribute("rooms", availableRooms);
+    }
+
+    /**
+     * Fetches the room by its roomNumber and throws if it is marked unavailable.
+     * @param roomNumberStr the room number as a string (from form param)
+     */
+    private void validateRoomAvailable(String roomNumberStr) {
+        if (roomNumberStr == null || roomNumberStr.isBlank()) return;
+        try {
+            Map<String,Object> room = api.getOne(ROOM_API + "/" + roomNumberStr.trim());
+            if (room != null) {
+                Object unavailable = room.get("unavailable");
+                if (Boolean.TRUE.equals(unavailable) || "true".equalsIgnoreCase(String.valueOf(unavailable))) {
+                    throw new IllegalStateException(
+                            "Room " + roomNumberStr + " is currently unavailable and cannot be used for an appointment.");
+                }
+            }
+        } catch (IllegalStateException ex) {
+            throw ex;   // re-throw our own validation exception
+        } catch (Exception ex) {
+            // If room lookup fails for any other reason, skip validation gracefully
+        }
     }
 
     /**

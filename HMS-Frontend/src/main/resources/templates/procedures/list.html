@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8"/><title>Procedure — HospitalDB</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" th:href="@{/css/procedures.css}"/>
+<meta charset="UTF-8"/><title>Procedure — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/procedures.css}"/>
 </head>
 <body>
 <div class="navbar">
@@ -29,21 +29,19 @@
     <table>
       <thead><tr><th>Code</th><th>Name</th><th>Cost</th><th class="right">Actions</th></tr></thead>
       <tbody>
-      <tr th:each="item : ${page.items}">
-        <th:block th:with="pid=${item['code']}">
-          <td th:text="${pid}"></td>
-          <td th:text="${item['name']}"></td>
-          <td th:text="${'$' + item['cost']}"></td>
-          <td class="action-cell"><div>
-            <a class="btn-sm" th:href="@{'/procedures/' + ${pid}}">View</a>
-            <a class="btn-sm" th:href="@{'/procedures/' + ${pid} + '/edit'}">Update</a>
-            <form th:action="@{'/procedures/' + ${pid} + '/delete'}" method="post" style="display:inline">
-              <button class="btn-sm danger" onclick="return confirm('Delete?')">Delete</button>
-            </form>
-          </div></td>
-        </th:block>
-      </tr>
-      <tr th:if="${#lists.isEmpty(page.items)}" class="empty-row"><td colspan="4">No records found.</td></tr>
+        <tr th:each="item : ${page.items}">
+          <th:block th:with="pid=${item['code']}">
+            <td th:text="${pid}"></td>
+            <td th:text="${item['name']}"></td>
+            <td th:text="${'$' + item['cost']}"></td>
+            <td class="action-cell"><div>
+              <a class="btn-sm" th:href="@{'/procedures/' + ${pid}}">View</a>
+              <a class="btn-sm" th:href="@{'/procedures/' + ${pid} + '/edit'}">Update</a>
+
+            </div></td>
+          </th:block>
+        </tr>
+        <tr th:if="${#lists.isEmpty(page.items)}" class="empty-row"><td colspan="4">No records found.</td></tr>
       </tbody>
     </table>
   </div>

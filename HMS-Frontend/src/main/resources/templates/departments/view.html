@@ -10,7 +10,7 @@
 </head>
 <body>
 
-
+<!-- Navbar -->
 <div class="navbar">
   <a class="navbar-logo" href="/">
 
@@ -30,7 +30,7 @@
 
   <a href="/departments" class="back-btn">← Back to Department</a>
 
-  
+  <!-- Header -->
   <div class="detail-top">
     <div>
       <div class="detail-title" th:text="${item['name']}"></div>
@@ -38,14 +38,11 @@
     </div>
     <div class="detail-actions">
       <a class="btn-edit" th:href="@{'/departments/' + ${item['departmentId']} + '/edit'}">✎ EDIT</a>
-      <form th:action="@{'/departments/' + ${item['departmentId']} + '/delete'}" method="post" style="display:inline">
-        <button class="btn-del" onclick="return confirm('Delete this department?')">🗑 DELETE</button>
-      </form>
     </div>
   </div>
   <hr class="detail-divider"/>
 
-  
+  <!-- ── Department Details ── -->
   <div class="detail-section-title"><span>📋</span> Department Details</div>
   <table class="detail-table">
     <tbody>
@@ -74,7 +71,7 @@
     </tbody>
   </table>
 
- 
+  <!-- ── Affiliated Physicians ── -->
   <div class="rel-section">
     <div class="rel-title">
       🏥 Affiliated Physicians
@@ -97,7 +94,7 @@
               class="clickable-row"
               th:onclick="|window.location='/physicians/' + ${aff['physicianEmployeeId']}|">
 
-           
+            <!-- Physician name → link -->
             <td>
               <a class="row-link"
                  th:href="@{'/physicians/' + ${aff['physicianEmployeeId']}}"
@@ -105,10 +102,10 @@
                  onclick="event.stopPropagation()"></a>
             </td>
 
-            
+            <!-- Department name (plain text) -->
             <td th:text="${item['name']}"></td>
 
-           
+            <!-- PrimaryAffiliation badge -->
             <td>
               <span th:if="${aff['primaryAffiliation'] == true}"  class="badge badge-yes">Yes</span>
               <span th:if="${aff['primaryAffiliation'] != true}"  class="badge badge-no">No</span>
@@ -119,6 +116,6 @@
     </div>
   </div>
 
-</div>
+</div><!-- /page -->
 </body>
 </html>

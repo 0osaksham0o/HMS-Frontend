@@ -1,162 +1,159 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title th:text="'Patient — ' + ${item['name']} + ' — HospitalDB'">Patient Detail — HospitalDB</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" th:href="@{/css/patients.css}"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title th:text="'Patient — ' + ${item['name']} + ' — HospitalDB'">Patient Detail — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/patients.css}"/>
 </head>
 <body>
 
 <!-- Navbar -->
 <div class="navbar">
-    <a class="navbar-logo" href="/">
+  <a class="navbar-logo" href="/">
 
-        <div class="logo-icon">✚</div>
+    <div class="logo-icon">✚</div>
 
-        <span>MediVeda</span>
+    <span>MediVeda</span>
 
-    </a>
-    <div class="breadcrumb">
-        <span class="bc-link"><a href="/patients" style="color:#555;text-decoration:none;">Patient</a></span>
-        <span class="bc-sep">›</span>
-        <span class="bc-cur" th:text="${item['name']}"></span>
-    </div>
+  </a>
+  <div class="breadcrumb">
+    <span class="bc-link"><a href="/patients" style="color:#555;text-decoration:none;">Patient</a></span>
+    <span class="bc-sep">›</span>
+    <span class="bc-cur" th:text="${item['name']}"></span>
+  </div>
 </div>
 
 <div class="page">
 
-    <!-- Back button -->
-    <a href="/patients" class="back-btn">← Back to Patient</a>
+  <!-- Back button -->
+  <a href="/patients" class="back-btn">← Back to Patient</a>
 
-    <!-- Header: name + EDIT / DELETE -->
-    <div class="detail-top">
-        <div>
-            <div class="detail-title" th:text="${item['name']}"></div>
-            <div class="detail-sub">Patient</div>
-        </div>
-        <div class="detail-actions">
-            <a class="btn-edit" th:href="@{'/patients/' + ${item['ssn']} + '/edit'}">✎ EDIT</a>
-            <form th:action="@{'/patients/' + ${item['ssn']} + '/delete'}" method="post" style="display:inline">
-                <button class="btn-del" onclick="return confirm('Delete this patient?')">🗑 DELETE</button>
-            </form>
-        </div>
+  <!-- Header: name + EDIT -->
+  <div class="detail-top">
+    <div>
+      <div class="detail-title" th:text="${item['name']}"></div>
+      <div class="detail-sub">Patient</div>
+    </div>
+    <div class="detail-actions">
+      <a class="btn-edit" th:href="@{'/patients/' + ${item['ssn']} + '/edit'}">✎ EDIT</a>
+    </div>
+  </div>
+
+  <hr class="detail-divider"/>
+
+  <!-- ── Patient Details ── -->
+  <div class="detail-section-title"><span>📋</span> Patient Details</div>
+  <table class="detail-table">
+    <tbody>
+      <tr>
+        <td class="key-cell">SSN</td>
+        <td class="val-cell" th:text="${item['ssn']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">NAME</td>
+        <td class="val-cell" th:text="${item['name']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">ADDRESS</td>
+        <td class="val-cell" th:text="${item['address']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">PHONE</td>
+        <td class="val-cell" th:text="${item['phone']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">INSURANCEID</td>
+        <td class="val-cell" th:text="${item['insuranceId']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">PCP</td>
+        <td class="val-cell">
+          <th:block th:if="${item['primaryCarePhysicianId'] != null}">
+            <a class="fk-link"
+               th:href="@{'/physicians/' + ${item['primaryCarePhysicianId']}}"
+               th:text="${item['primaryCarePhysicianName'] ?: ('Physician #' + item['primaryCarePhysicianId'])}"></a>
+          </th:block>
+          <th:block th:if="${item['primaryCarePhysicianId'] == null}">—</th:block>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Appointments ── -->
+  <div class="rel-section">
+    <div class="rel-title">
+      🔗 Appointments
+      <span class="rel-count" th:text="${#lists.size(appointments)}">0</span>
+      <span class="rel-hint">— click row to open</span>
     </div>
 
-    <hr class="detail-divider"/>
-
-    <!-- ── Patient Details ── -->
-    <div class="detail-section-title"><span>📋</span> Patient Details</div>
-    <table class="detail-table">
+    <div class="data-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Appointment ID</th>
+            <th>Patient</th>
+            <th>Prep Nurse</th>
+            <th>Physician</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Room</th>
+          </tr>
+        </thead>
         <tbody>
-        <tr>
-            <td class="key-cell">SSN</td>
-            <td class="val-cell" th:text="${item['ssn']}"></td>
-        </tr>
-        <tr>
-            <td class="key-cell">NAME</td>
-            <td class="val-cell" th:text="${item['name']}"></td>
-        </tr>
-        <tr>
-            <td class="key-cell">ADDRESS</td>
-            <td class="val-cell" th:text="${item['address']}"></td>
-        </tr>
-        <tr>
-            <td class="key-cell">PHONE</td>
-            <td class="val-cell" th:text="${item['phone']}"></td>
-        </tr>
-        <tr>
-            <td class="key-cell">INSURANCEID</td>
-            <td class="val-cell" th:text="${item['insuranceId']}"></td>
-        </tr>
-        <tr>
-            <td class="key-cell">PCP</td>
-            <td class="val-cell">
-                <th:block th:if="${item['primaryCarePhysicianId'] != null}">
-                    <a class="fk-link"
-                       th:href="@{'/physicians/' + ${item['primaryCarePhysicianId']}}"
-                       th:text="${item['primaryCarePhysicianName'] ?: ('Physician #' + item['primaryCarePhysicianId'])}"></a>
-                </th:block>
-                <th:block th:if="${item['primaryCarePhysicianId'] == null}">—</th:block>
+          <tr th:if="${#lists.isEmpty(appointments)}" class="empty-row">
+            <td colspan="7">No related records.</td>
+          </tr>
+          <tr th:each="appt : ${appointments}"
+              class="clickable-row"
+              th:onclick="|window.location='/appointments/' + ${appt['appointmentId']}|"
+              title="Open Appointment">
+
+            <!-- AppointmentID -->
+            <td th:text="${appt['appointmentId']}"></td>
+
+            <!-- Patient (current patient — show as plain text) -->
+            <td th:text="${item['name']}"></td>
+
+            <!-- PrepNurse: clickable link if present, dash if null -->
+            <td>
+              <th:block th:if="${appt['prepNurseId'] != null}">
+                <a class="row-link"
+                   th:href="@{'/nurses/' + ${appt['prepNurseId']}}"
+                   th:text="${appt['prepNurseName'] ?: ('Nurse #' + appt['prepNurseId'])}"
+                   onclick="event.stopPropagation()"></a>
+              </th:block>
+              <th:block th:if="${appt['prepNurseId'] == null}">—</th:block>
             </td>
-        </tr>
+
+            <!-- Physician: clickable link -->
+            <td>
+              <th:block th:if="${appt['physicianId'] != null}">
+                <a class="row-link"
+                   th:href="@{'/physicians/' + ${appt['physicianId']}}"
+                   th:text="${appt['physicianName'] ?: ('Physician #' + appt['physicianId'])}"
+                   onclick="event.stopPropagation()"></a>
+              </th:block>
+              <th:block th:if="${appt['physicianId'] == null}">—</th:block>
+            </td>
+
+            <!-- Start -->
+            <td th:text="${appt['start'] != null ? appt['start'] : '—'}"></td>
+
+            <!-- End -->
+            <td th:text="${appt['end'] != null ? appt['end'] : '—'}"></td>
+
+            <!-- ExaminationRoom -->
+            <td th:text="${appt['examinationRoom'] != null ? appt['examinationRoom'] : '—'}"></td>
+
+          </tr>
         </tbody>
-    </table>
-
-    <!-- ── Appointments ── -->
-    <div class="rel-section">
-        <div class="rel-title">
-            🔗 Appointments
-            <span class="rel-count" th:text="${#lists.size(appointments)}">0</span>
-            <span class="rel-hint">— click row to open</span>
-        </div>
-
-        <div class="data-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th>Appointment ID</th>
-                    <th>Patient</th>
-                    <th>Prep Nurse</th>
-                    <th>Physician</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Room</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(appointments)}" class="empty-row">
-                    <td colspan="7">No related records.</td>
-                </tr>
-                <tr th:each="appt : ${appointments}"
-                    class="clickable-row"
-                    th:onclick="|window.location='/appointments/' + ${appt['appointmentId']}|"
-                    title="Open Appointment">
-
-                    <!-- AppointmentID -->
-                    <td th:text="${appt['appointmentId']}"></td>
-
-                    <!-- Patient (current patient — show as plain text) -->
-                    <td th:text="${item['name']}"></td>
-
-                    <!-- PrepNurse: clickable link if present, dash if null -->
-                    <td>
-                        <th:block th:if="${appt['prepNurseId'] != null}">
-                            <a class="row-link"
-                               th:href="@{'/nurses/' + ${appt['prepNurseId']}}"
-                               th:text="${appt['prepNurseName'] ?: ('Nurse #' + appt['prepNurseId'])}"
-                               onclick="event.stopPropagation()"></a>
-                        </th:block>
-                        <th:block th:if="${appt['prepNurseId'] == null}">—</th:block>
-                    </td>
-
-                    <!-- Physician: clickable link -->
-                    <td>
-                        <th:block th:if="${appt['physicianId'] != null}">
-                            <a class="row-link"
-                               th:href="@{'/physicians/' + ${appt['physicianId']}}"
-                               th:text="${appt['physicianName'] ?: ('Physician #' + appt['physicianId'])}"
-                               onclick="event.stopPropagation()"></a>
-                        </th:block>
-                        <th:block th:if="${appt['physicianId'] == null}">—</th:block>
-                    </td>
-
-                    <!-- Start -->
-                    <td th:text="${appt['start'] != null ? appt['start'] : '—'}"></td>
-
-                    <!-- End -->
-                    <td th:text="${appt['end'] != null ? appt['end'] : '—'}"></td>
-
-                    <!-- ExaminationRoom -->
-                    <td th:text="${appt['examinationRoom'] != null ? appt['examinationRoom'] : '—'}"></td>
-
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div><!-- /rel-section -->
+      </table>
+    </div>
+  </div><!-- /rel-section -->
 
 </div><!-- /page -->
 </body>

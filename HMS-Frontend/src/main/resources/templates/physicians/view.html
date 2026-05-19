@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title th:text="'Physician — ' + ${item['name']} + ' — HospitalDB'">Physician Detail — HospitalDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" th:href="@{/css/physicians.css}"/>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+  <a class="navbar-logo" href="/">
+
+    <div class="logo-icon">✚</div>
+
+    <span>MediVeda</span>
+
+  </a>
+  <div class="breadcrumb">
+    <span class="bc-link"><a href="/physicians" style="color:#555;text-decoration:none;">Physician</a></span>
+    <span class="bc-sep">›</span>
+    <span class="bc-cur" th:text="${item['name']}"></span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Back button -->
+  <a href="/physicians" class="back-btn">← Back to Physician</a>
+
+  <!-- Header: name + EDIT -->
+  <div class="detail-top">
+    <div>
+      <div class="detail-title" th:text="${item['name']}"></div>
+      <div class="detail-sub">Physician</div>
+    </div>
+    <div class="detail-actions">
+      <a class="btn-edit" th:href="@{'/physicians/' + ${item['employeeId']} + '/edit'}">✎ EDIT</a>
+    </div>
+  </div>
+
+  <hr class="detail-divider"/>
+
+  <!-- ── Physician Details ── -->
+  <div class="detail-section-title"><span>📋</span> Physician Details</div>
+  <table class="detail-table">
+    <tbody>
+      <tr>
+        <td class="key-cell">EMPLOYEEID</td>
+        <td class="val-cell" th:text="${item['employeeId']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">NAME</td>
+        <td class="val-cell" th:text="${item['name']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">POSITION</td>
+        <td class="val-cell" th:text="${item['position']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">SSN</td>
+        <td class="val-cell" th:text="${item['ssn']}"></td>
+      </tr>
+      <tr>
+        <td class="key-cell">PROCEDURENAME</td>
+        <td class="val-cell" th:text="${procedureNames}"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ── Procedures Certified For ── -->
+  <div class="rel-section">
+    <div class="rel-title">
+      🔗 Procedures Certified For
+      <span class="rel-count" th:text="${#lists.size(certifiedProcedures)}">0</span>
+      <span class="rel-hint">— click row to open</span>
+    </div>
+
+    <div class="data-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ProcedureName</th>
+            <th>ProcedureCost</th>
+            <th>CertificationDate</th>
+            <th>CertificationExpires</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(certifiedProcedures)}" class="empty-row">
+            <td colspan="4">No procedures certified.</td>
+          </tr>
+          <tr th:each="proc : ${certifiedProcedures}"
+              class="clickable-row"
+              th:onclick="|window.location='/procedures/' + ${proc['procedureCode']}|"
+              title="Open Procedure">
+            <td th:text="${proc['procedureName']}"></td>
+            <td th:text="${proc['procedureCost']}"></td>
+            <td th:text="${proc['certificationDate'] != null ? #strings.replace(#strings.substring(proc['certificationDate'].toString(), 0, 10), 'T', ' ') : '—'}"></td>
+            <td th:text="${proc['certificationExpires'] != null ? #strings.replace(#strings.substring(proc['certificationExpires'].toString(), 0, 10), 'T', ' ') : '—'}"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Department Affiliations ── -->
+  <div class="rel-section">
+    <div class="rel-title">
+      📄 Department Affiliations
+      <span class="rel-count" th:text="${#lists.size(affiliations)}">0</span>
+    </div>
+
+    <div class="data-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Physician</th>
+            <th>Department</th>
+            <th>PrimaryAffiliation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${#lists.isEmpty(affiliations)}" class="empty-row">
+            <td colspan="3">No department affiliations.</td>
+          </tr>
+          <tr th:each="aff : ${affiliations}">
+            <!-- Physician (plain text — current physician) -->
+            <td th:text="${item['name']}"></td>
+
+            <!-- Department (clickable link) -->
+            <td>
+              <a class="row-link"
+                 th:href="@{'/departments/' + ${aff['departmentIdResolved']}}"
+                 th:text="${aff['departmentName']}"></a>
+            </td>
+
+            <!-- PrimaryAffiliation (Yes/No badge) -->
+            <td>
+              <span th:if="${aff['primaryAffiliation'] == true}"
+                    class="badge badge-yes">Yes</span>
+              <span th:if="${aff['primaryAffiliation'] != true}"
+                    class="badge badge-no">No</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>

@@ -43,9 +43,7 @@
             <td class="action-cell"><div>
               <a class="btn-sm" th:href="@{'/departments/' + ${did}}">View</a>
               <a class="btn-sm" th:href="@{'/departments/' + ${did} + '/edit'}">Update</a>
-              <form th:action="@{'/departments/' + ${did} + '/delete'}" method="post" style="display:inline">
-                <button class="btn-sm danger" onclick="return confirm('Delete?')">Delete</button>
-              </form>
+
             </div></td>
           </th:block>
         </tr>
