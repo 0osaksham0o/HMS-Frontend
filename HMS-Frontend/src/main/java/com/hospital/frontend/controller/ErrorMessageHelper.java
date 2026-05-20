@@ -30,6 +30,14 @@ public final class ErrorMessageHelper {
                     + "Please remove the related records first.";
         }
 
+        // ── Scheduling / booking conflicts ─────────────────────────────────
+        if (lower.contains("scheduling conflict") || lower.contains("already has an appointment")
+                || lower.contains("already booked") || lower.contains("already assigned")) {
+            // The raw message from validateNoConflicts() is already user-friendly — return it directly
+            if (raw.length() <= 300) return raw;
+            return "Scheduling conflict: this time slot is already booked. Please choose a different date, time, or provider.";
+        }
+
         // ── Duplicate / unique-key violations ─────────────────────────────
         if (lower.contains("duplicate entry") || lower.contains("unique constraint")) {
             return "A record with that ID or value already exists. Please use a different value.";
@@ -70,7 +78,7 @@ public final class ErrorMessageHelper {
         }
 
         // ── Fallback ───────────────────────────────────────────────────────
-        return "Cannot delete this record: it is linked to other data in the system. Please remove the related records first.";
+        return "An unexpected error occurred. Please check your input and try again.";
     }
 
     /**
