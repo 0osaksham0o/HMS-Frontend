@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.*;
+import java.time.LocalDateTime;
 
 @Controller @RequestMapping("/appointments")
 public class AppointmentWebController {
@@ -39,8 +40,11 @@ public class AppointmentWebController {
     public String create(@RequestParam Map<String,String> p, Model m, RedirectAttributes ra) {
         try {
             validateRoomAvailable(p.get("examinationRoom"));
+            validateNotInPast(p);
+            validateNoConflicts(null, p);
             Map<String,Object> d = buildPayload(null, p);
             api.post(API, d);
+            markRoomUnavailable(p.get("examinationRoom")); // mark room booked
             ra.addFlashAttribute("success", "Appointment created successfully.");
             return "redirect:/appointments";
         } catch (Exception e) {
@@ -65,8 +69,11 @@ public class AppointmentWebController {
                          Model m, RedirectAttributes ra) {
         try {
             validateRoomAvailable(p.get("examinationRoom"));
+            validateNotInPast(p);
+            validateNoConflicts(id, p);
             Map<String,Object> d = buildPayload(id, p);
             api.put(API+"/"+id, d);
+            markRoomUnavailable(p.get("examinationRoom")); // mark room booked
             ra.addFlashAttribute("success", "Appointment updated successfully.");
             return "redirect:/appointments/"+id;
         } catch (Exception e) {
@@ -138,6 +145,111 @@ public class AppointmentWebController {
             throw ex;   // re-throw our own validation exception
         } catch (Exception ex) {
             // If room lookup fails for any other reason, skip validation gracefully
+        }
+    }
+
+    /**
+     * Fetches the room by its roomNumber and flips unavailable=true via PUT.
+     * Failure is silent — the appointment is already saved.
+     */
+    private void markRoomUnavailable(String roomNumberStr) {
+        if (roomNumberStr == null || roomNumberStr.isBlank()) return;
+        try {
+            Map<String,Object> room = api.getOne(ROOM_API + "/" + roomNumberStr.trim());
+            if (room != null) {
+                Map<String,Object> updated = new HashMap<>(room);
+                updated.put("unavailable", true);
+                api.put(ROOM_API + "/" + roomNumberStr.trim(), updated);
+            }
+        } catch (Exception ex) {
+            // Non-critical: appointment already saved, room status update failed silently
+        }
+    }
+
+    /**
+     * Validates that the appointment start date/time is not in the past.
+     * Throws IllegalStateException if the submitted start is before LocalDateTime.now().
+     */
+    private void validateNotInPast(Map<String,String> p) {
+        String startDate = p.get("startDate");
+        String startTime = p.get("startTime");
+        if (startDate == null || startDate.isBlank() || startTime == null || startTime.isBlank()) return;
+        try {
+            LocalDateTime submitted = LocalDateTime.parse(startDate + "T" + startTime);
+            if (submitted.isBefore(LocalDateTime.now())) {
+                throw new IllegalStateException(
+                    "Appointment start date/time (" + startDate + " " + startTime +
+                    ") cannot be in the past. Please select today or a future date and time.");
+            }
+        } catch (IllegalStateException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            // Parsing failed — backend will validate further
+        }
+    }
+
+    /**
+     * Checks all existing appointments for scheduling conflicts at the same time.
+     * Throws IllegalStateException if the same patient, physician, or nurse is
+     * already booked in an overlapping time window.
+     *
+     * @param excludeId appointment ID to skip (the one being updated); null for new
+     * @param p         raw form params (startDate, startTime, endDate, endTime,
+     *                  patientSsn, physicianId, prepNurseId)
+     */
+    private void validateNoConflicts(Integer excludeId, Map<String,String> p) {
+        String newStart    = p.get("startDate") + "T" + p.get("startTime");
+        String newEnd      = p.get("endDate")   + "T" + p.get("endTime");
+        String newPatient  = p.get("patientSsn")  != null ? p.get("patientSsn").trim()  : "";
+        String newPhysician= p.get("physicianId") != null ? p.get("physicianId").trim() : "";
+        String newNurse    = p.get("prepNurseId") != null ? p.get("prepNurseId").trim() : "";
+
+        List<Map<String,Object>> all = api.getList(API);
+        if (all == null) return;
+
+        for (Map<String,Object> existing : all) {
+            // Skip the appointment being edited
+            Object existingId = existing.get("appointmentId");
+            if (excludeId != null && existingId != null
+                    && String.valueOf(existingId).equals(String.valueOf(excludeId))) {
+                continue;
+            }
+
+            // Extract existing time window
+            String exStart = existing.get("start") != null ? existing.get("start").toString() : "";
+            String exEnd   = existing.get("end")   != null ? existing.get("end").toString()   : "";
+            if (exStart.isEmpty() || exEnd.isEmpty()) continue;
+
+            // Overlap: newStart < exEnd  AND  exStart < newEnd
+            boolean overlaps = newStart.compareTo(exEnd) < 0 && exStart.compareTo(newEnd) < 0;
+            if (!overlaps) continue;
+
+            // Check patient conflict
+            Object exPatient = existing.get("patientSsn");
+            if (!newPatient.isEmpty() && exPatient != null
+                    && newPatient.equals(String.valueOf(exPatient))) {
+                throw new IllegalStateException(
+                    "Scheduling conflict: Patient (SSN " + newPatient +
+                    ") already has an appointment overlapping " + newStart + " – " + newEnd + ".");
+            }
+
+            // Check physician conflict
+            Object exPhysician = existing.get("physicianId");
+            if (!newPhysician.isEmpty() && exPhysician != null
+                    && newPhysician.equals(String.valueOf(exPhysician))) {
+                throw new IllegalStateException(
+                    "Scheduling conflict: Physician (ID " + newPhysician +
+                    ") is already booked in an overlapping time slot " + newStart + " – " + newEnd + ".");
+            }
+
+            // Check nurse conflict (only if a nurse was selected)
+            Object exNurse = existing.get("prepNurseId");
+            if (!newNurse.isEmpty() && exNurse != null
+                    && newNurse.equals(String.valueOf(exNurse))) {
+                throw new IllegalStateException(
+                    "Scheduling conflict: Prep Nurse (ID " + newNurse +
+                    ") is already assigned to another appointment overlapping " + newStart + " – " + newEnd + ".");
+            }
         }
     }
 

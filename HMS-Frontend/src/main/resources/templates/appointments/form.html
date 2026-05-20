@@ -67,6 +67,7 @@
                 <div class="form-group">
                     <label>Appointment ID</label>
                     <input type="number" name="appointmentId"
+                           min="1"
                            th:value="${item['appointmentId']}"
                            th:readonly="${!isNew}" required/>
                 </div>
@@ -90,7 +91,8 @@
                     <div class="datetime-row">
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" name="startDate" required
+                            <input type="date" name="startDate" id="startDate" required
+                                   th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
                                    th:value="${item['startDate'] != null ? item['startDate'] :
                                 (item['start'] != null ?
                                   #strings.substring(item['start'].toString(), 0, 10) : '')}"/>
@@ -111,7 +113,8 @@
                     <div class="datetime-row">
                         <div class="form-group">
                             <label>Date</label>
-                            <input type="date" name="endDate" required
+                            <input type="date" name="endDate" id="endDate" required
+                                   th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
                                    th:value="${item['endDate'] != null ? item['endDate'] :
                                 (item['end'] != null ?
                                   #strings.substring(item['end'].toString(), 0, 10) : '')}"/>
@@ -175,4 +178,19 @@
         </form>
     </div>
 </div>
+<script>
+  // Enforce today as the minimum selectable date for both date pickers
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const sd = document.getElementById('startDate');
+  const ed = document.getElementById('endDate');
+  if (sd && !sd.getAttribute('min')) sd.setAttribute('min', todayStr);
+  if (ed && !ed.getAttribute('min')) ed.setAttribute('min', todayStr);
+
+  // Keep endDate min in sync: it must never be before startDate
+  if (sd && ed) {
+    sd.addEventListener('change', () => {
+      if (sd.value) ed.setAttribute('min', sd.value);
+    });
+  }
+</script>
 </body></html>

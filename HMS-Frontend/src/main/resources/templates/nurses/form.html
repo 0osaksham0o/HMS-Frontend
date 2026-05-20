@@ -32,22 +32,29 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Employee ID</label>
-          <input type="number" name="employeeId" th:value="${item['employeeId']}" th:readonly="${!isNew}" required/>
+          <input type="number" name="employeeId" min="1" th:value="${item['employeeId']}" th:readonly="${!isNew}" required/>
         </div>
         <div class="form-group">
           <label>SSN</label>
           <input type="number" name="ssn"
+                 min="1"
                  th:value="${item['ssn']}"
                  th:readonly="${!isNew}"
                  required/>
         </div>
         <div class="form-group full">
           <label>Name</label>
-          <input type="text" name="name" th:value="${item['name']}" required/>
+          <input type="text" name="name"
+                 pattern="[A-Za-z '.\-]+"
+                 title="Only English letters, spaces, hyphens, apostrophes, and periods allowed"
+                 th:value="${item['name']}" required/>
         </div>
         <div class="form-group full">
           <label>Position</label>
-          <input type="text" name="position" th:value="${item['position']}" required/>
+          <input type="text" name="position"
+                 pattern="[A-Za-z '.\-]+"
+                 title="Only English letters, spaces, hyphens, apostrophes, and periods allowed"
+                 th:value="${item['position']}" required/>
         </div>
         <div class="form-group full">
           <label>Registered</label>

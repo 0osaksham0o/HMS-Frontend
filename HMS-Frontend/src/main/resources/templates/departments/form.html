@@ -34,6 +34,7 @@
         <div class="form-group">
           <label>Department ID</label>
           <input type="number" name="departmentId"
+                 min="1"
                  th:value="${item['departmentId']}"
                  th:readonly="${!isNew}" required/>
         </div>
@@ -53,6 +54,8 @@
         <div class="form-group full">
           <label>Name</label>
           <input type="text" name="name"
+                 pattern="[A-Za-z '.\-]+"
+                 title="Only English letters, spaces, hyphens, apostrophes, and periods allowed"
                  th:value="${item['name']}"
                  required/>
         </div>

@@ -61,59 +61,66 @@
     </tbody>
   </table>
 
-  <!-- ── Current / Past Occupants (Stays) ── -->
+  <!-- ── Booked Appointments ── -->
   <div class="rel-section">
     <div class="rel-title">
-      🔗 Current / Past Occupants (Stays)
-      <span class="rel-count" th:text="${#lists.size(roomStays)}">0</span>
+      📅 Booked Appointments
+      <span class="rel-count" th:text="${#lists.size(roomAppointments)}">0</span>
       <span class="rel-hint">— click row to open</span>
     </div>
     <div class="data-wrap">
       <table>
         <thead>
           <tr>
-            <th>StayID</th>
+            <th>Appt ID</th>
             <th>Patient</th>
-            <th>Room</th>
-            <th>StayStart</th>
-            <th>StayEnd</th>
+            <th>Physician</th>
+            <th>Start</th>
+            <th>End</th>
           </tr>
         </thead>
         <tbody>
-          <tr th:if="${#lists.isEmpty(roomStays)}" class="empty-row">
-            <td colspan="5">No related records.</td>
+          <tr th:if="${#lists.isEmpty(roomAppointments)}" class="empty-row">
+            <td colspan="5">No appointments booked in this room.</td>
           </tr>
-          <tr th:each="s : ${roomStays}"
+          <tr th:each="a : ${roomAppointments}"
               class="clickable-row"
-              th:onclick="|window.location='/stays/' + ${s['stayId']}|">
+              th:onclick="|window.location='/appointments/' + ${a['appointmentId']}|">
 
-            <!-- StayID -->
+            <!-- Appointment ID -->
             <td>
               <a class="row-link"
-                 th:href="@{'/stays/' + ${s['stayId']}}"
-                 th:text="${s['stayId']}"
+                 th:href="@{'/appointments/' + ${a['appointmentId']}}"
+                 th:text="${a['appointmentId']}"
                  onclick="event.stopPropagation()"></a>
             </td>
 
             <!-- Patient (enriched from controller) -->
             <td>
               <a class="row-link"
-                 th:href="@{'/patients/' + ${s['patientSsnResolved']}}"
-                 th:text="${s['patientName']}"
+                 th:href="@{'/patients/' + ${a['patientSsnResolved']}}"
+                 th:text="${a['patientName']}"
                  onclick="event.stopPropagation()"></a>
             </td>
 
-            <!-- Room number -->
-            <td th:text="${item['roomNumber']}"></td>
+            <!-- Physician (enriched from controller) -->
+            <td>
+              <a class="row-link"
+                 th:href="@{'/physicians/' + ${a['physicianIdResolved']}}"
+                 th:text="${a['physicianName']}"
+                 onclick="event.stopPropagation()"></a>
+            </td>
 
-            <!-- StayStart (date only) -->
-            <td th:text="${s['stayStart'] != null
-                          ? #strings.substring(s['stayStart'].toString(), 0, 10)
+            <!-- Start (datetime trimmed to YYYY-MM-DD HH:MM) -->
+            <td th:text="${a['start'] != null
+                          ? #strings.substring(a['start'].toString(), 0,
+                              (#strings.length(a['start'].toString()) > 16 ? 16 : #strings.length(a['start'].toString())))
                           : '—'}"></td>
 
-            <!-- StayEnd (date only) -->
-            <td th:text="${s['stayEnd'] != null
-                          ? #strings.substring(s['stayEnd'].toString(), 0, 10)
+            <!-- End (datetime trimmed to YYYY-MM-DD HH:MM) -->
+            <td th:text="${a['end'] != null
+                          ? #strings.substring(a['end'].toString(), 0,
+                              (#strings.length(a['end'].toString()) > 16 ? 16 : #strings.length(a['end'].toString())))
                           : '—'}"></td>
           </tr>
         </tbody>
@@ -124,3 +131,4 @@
 </div><!-- /page -->
 </body>
 </html>
+

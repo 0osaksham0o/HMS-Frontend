@@ -34,6 +34,7 @@
                 <div class="form-group">
                     <label>SSN</label>
                     <input type="number" name="ssn"
+                           min="1"
                            th:value="${item['ssn']}"
                            th:readonly="${!isNew}"
                            required/>
@@ -41,12 +42,15 @@
                 <div class="form-group">
                     <label>Insurance ID</label>
                     <input type="number" name="insuranceId"
+                           min="1"
                            th:value="${item['insuranceId']}"
                            required/>
                 </div>
                 <div class="form-group full">
                     <label>Name</label>
                     <input type="text" name="name"
+                           pattern="[A-Za-z '.\-]+"
+                           title="Only English letters, spaces, hyphens, apostrophes, and periods allowed"
                            th:value="${item['name']}"
                            required/>
                 </div>

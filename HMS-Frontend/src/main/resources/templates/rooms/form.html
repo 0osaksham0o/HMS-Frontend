@@ -28,7 +28,7 @@
     <form th:action="${isNew} ? '/rooms' : '/rooms/' + ${item['roomNumber']} + '/update'" method="post">
       <div class="form-grid">
         <div class="form-group"><label>Room Number</label>
-          <input type="number" name="roomNumber" th:value="${item['roomNumber']}" th:readonly="${!isNew}" required/>
+          <input type="number" name="roomNumber" min="1" th:value="${item['roomNumber']}" th:readonly="${!isNew}" required/>
         </div>
         <div class="form-group"><label>Room Type</label>
           <select name="roomType">
@@ -39,10 +39,10 @@
           </select>
         </div>
         <div class="form-group"><label>Block Floor</label>
-          <input type="number" name="blockFloor" th:value="${item['blockFloor']}" required/>
+          <input type="number" name="blockFloor" min="1" th:value="${item['blockFloor']}" required/>
         </div>
         <div class="form-group"><label>Block Code</label>
-          <input type="number" name="blockCode" th:value="${item['blockCode']}" required/>
+          <input type="number" name="blockCode" min="1" th:value="${item['blockCode']}" required/>
         </div>
         <div class="form-group full"><label>Unavailable</label>
           <select name="unavailable">

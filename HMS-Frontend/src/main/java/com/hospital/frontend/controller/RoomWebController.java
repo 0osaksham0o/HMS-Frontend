@@ -22,10 +22,10 @@ public class RoomWebController {
     public String view(@PathVariable int id, Model m) {
         m.addAttribute("item", api.getOne(API + "/" + id));
 
-        // ── Current / Past Occupants (Stays) ──────────────────────────────
-        // StayController returns StayDTO with flat fields: stayId, patientSsn, roomNumber, stayStart, stayEnd
-        List<Map<String, Object>> allStays = api.getList("/api/stays");
-        List<Map<String, Object>> allPatients = api.getList("/api/patients");
+        // ── Booked Appointments ───────────────────────────────────────────
+        List<Map<String, Object>> allAppointments = api.getList("/api/appointments");
+        List<Map<String, Object>> allPatients     = api.getList("/api/patients");
+        List<Map<String, Object>> allPhysicians   = api.getList("/api/physicians");
 
         // Build patient lookup: ssn → patient map
         Map<String, Map<String, Object>> patBySsn = new HashMap<>();
@@ -34,20 +34,37 @@ public class RoomWebController {
             if (ssn != null) patBySsn.put(String.valueOf(ssn), p);
         }
 
-        // Filter by flat roomNumber and enrich with patient name
-        List<Map<String, Object>> roomStays = new java.util.ArrayList<>();
-        for (Map<String, Object> s : allStays) {
-            Object rn = s.get("roomNumber");
-            if (rn != null && String.valueOf(rn).equals(String.valueOf(id))) {
-                Map<String, Object> enriched = new LinkedHashMap<>(s);
-                Object ssn = s.get("patientSsn");
+        // Build physician lookup: id → physician map
+        Map<String, Map<String, Object>> phyById = new HashMap<>();
+        for (Map<String, Object> ph : allPhysicians) {
+            Object pid = ph.get("employeeId");
+            if (pid != null) phyById.put(String.valueOf(pid), ph);
+        }
+
+        // Filter appointments whose examinationRoom matches this room's id
+        List<Map<String, Object>> roomAppointments = new java.util.ArrayList<>();
+        for (Map<String, Object> a : allAppointments) {
+            Object er = a.get("examinationRoom");
+            if (er != null && String.valueOf(er).equals(String.valueOf(id))) {
+                Map<String, Object> enriched = new LinkedHashMap<>(a);
+
+                // Resolve patient name
+                Object ssn = a.get("patientSsn");
                 Map<String, Object> pat = ssn != null ? patBySsn.get(String.valueOf(ssn)) : null;
                 enriched.put("patientName", pat != null ? pat.get("name") : "Patient #" + ssn);
                 enriched.put("patientSsnResolved", ssn);
-                roomStays.add(enriched);
+
+                // Resolve physician name
+                Object phyId = a.get("physicianId");
+                Map<String, Object> phy = phyId != null ? phyById.get(String.valueOf(phyId)) : null;
+                enriched.put("physicianName", phy != null ? phy.get("name") : "Physician #" + phyId);
+                enriched.put("physicianIdResolved", phyId);
+
+                roomAppointments.add(enriched);
             }
         }
-        m.addAttribute("roomStays", roomStays);
+        m.addAttribute("roomAppointments", roomAppointments);
+
         return "rooms/view";
     }
     @GetMapping("/new")
